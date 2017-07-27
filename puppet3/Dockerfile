@@ -1,12 +1,11 @@
 ############################################################
 # Dockerfile to build an rspec-puppet container image
-# Based on fedora:21 because 22/latest uses too new of ruby
 ###########################################################
-FROM fedora:21
+FROM fedora:25
 MAINTAINER Greg Swift "gregswift@gmail.com"
 
 # Yum or dnf ? depends on fedora version. 22+ is dnf
-ENV pkgmgr yum
+ENV pkgmgr dnf
 
 # Set working dir as variable
 ENV module_dir /module
@@ -15,7 +14,7 @@ ENV module_dir /module
 RUN ${pkgmgr} -y update && \
     ${pkgmgr} -y install rubygems ruby-devel rubygem-nokogiri \
                          libxml2-devel libxslt-devel augeas-devel \
-                         git gcc gcc-c++ make tar && \
+                         git gcc gcc-c++ make tar redhat-rpm-config && \
     ${pkgmgr} clean all
 
 # Add Gemfile
@@ -24,7 +23,6 @@ ADD Gemfile /
 # Configure to ever install a ruby gem docs then
 # Install the relevant gems and cleanup after
 RUN printf "gem: --no-rdoc --no-ri" >> /etc/gemrc && \
-    gem install json -v '1.8.3' && \
     gem install bundler
 
 # Set Puppet Version
@@ -48,4 +46,3 @@ CMD rm -rf Gemfile.lock && \
 
 # Atomic Metadata
 LABEL RUN="docker run -it --rm -v \$(pwd):/module:z -v \${OPT1}:/ssh-agent:z -e SSH_AUTH_SOCK=/ssh-agent IMAGE"
-

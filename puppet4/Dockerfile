@@ -1,12 +1,12 @@
 ############################################################
 # Dockerfile to build an rspec-puppet container image
-# Based on fedora:21 because 22/latest uses too new of ruby
+# Based on fedora:25
 ###########################################################
-FROM fedora:21
+FROM fedora:25
 MAINTAINER Greg Swift "gregswift@gmail.com"
 
 # Yum or dnf ? depends on fedora version. 22+ is dnf
-ENV pkgmgr yum
+ENV pkgmgr dnf
 
 # Set working dir as variable
 ENV module_dir /module
@@ -15,7 +15,7 @@ ENV module_dir /module
 RUN ${pkgmgr} -y update && \
     ${pkgmgr} -y install rubygems ruby-devel rubygem-nokogiri \
                          libxml2-devel libxslt-devel augeas-devel \
-                         git gcc gcc-c++ make tar && \
+                         git gcc gcc-c++ make tar redhat-rpm-config && \
     ${pkgmgr} clean all
 
 # Add Gemfile
@@ -24,13 +24,12 @@ ADD Gemfile /
 # Configure to ever install a ruby gem docs then
 # Install the relevant gems and cleanup after
 RUN printf "gem: --no-rdoc --no-ri" >> /etc/gemrc && \
-    gem install json -v '1.8.3' && \
     gem install bundler
 
 # Set Puppet Version
 # TODO: Eventually we wont need separate files for this
 # https://github.com/docker/docker/issues/14634
-ENV puppetversion "~> 4.2"
+ENV puppetversion "~> 4.8"
 
 # Now do the bundle install. I Split this off to minimize differences between 3 and 4
 RUN PUPPET_GEM_VERSION=${puppetversion} bundler install --clean --system --gemfile /Gemfile
