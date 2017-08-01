@@ -14,7 +14,7 @@ ENV module_dir /module
 RUN ${pkgmgr} -y update && \
     ${pkgmgr} -y install rubygems ruby-devel rubygem-nokogiri \
                          libxml2-devel libxslt-devel augeas-devel \
-                         git gcc gcc-c++ make tar redhat-rpm-config && \
+                         git gcc gcc-c++ make tar redhat-rpm-config findutils && \
     ${pkgmgr} clean all
 
 # Add Gemfile
