@@ -15,7 +15,8 @@ ENV module_dir /module
 RUN ${pkgmgr} -y update && \
     ${pkgmgr} -y install rubygems ruby-devel rubygem-nokogiri \
                          libxml2-devel libxslt-devel augeas-devel \
-                         git gcc gcc-c++ make tar redhat-rpm-config && \
+                         git gcc gcc-c++ make tar \
+                         redhat-rpm-config findutils hostname && \
     ${pkgmgr} clean all
 
 # Add Gemfile
@@ -43,7 +44,7 @@ WORKDIR ${module_dir}
 # Our default command
 CMD rm -rf Gemfile.lock && \
     bundle exec rake spec_clean && \
-    bundle exec rake spec
+    bundle exec rake test
 
 # Atomic Metadata
 LABEL RUN="docker run -it --rm -v \$(pwd):/module:z -v \${OPT1}:/ssh-agent:z -e SSH_AUTH_SOCK=/ssh-agent IMAGE"
